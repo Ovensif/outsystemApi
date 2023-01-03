@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Crlist;
+use App\Models\Acrlist;
 
 class SimpleApi extends Controller
 {
@@ -82,6 +83,43 @@ class SimpleApi extends Controller
         return response(['status' => true, "data" => array(
             "top_vendor"    => ['vendor' => $top_vendor[0]['vendor'], 'total' => $top_vendor[0]['total']], 
             "top_regional"  => ['regional' => $top_regional[0]['regional'], 'total' => $top_regional[0]['total']])], 200);
+
+    }
+
+    public function postCreateAcr(Request $req)
+    {
+        // Get Latest Number then add 1
+        $latest_ticket = Acrlist::select('cr_number', 'id')->orderBy('id', 'DESC')->limit(1)->get();
+        $latest_number_ticket = $latest_ticket->toArray();
+
+        $number_ticket = explode("_", $latest_number_ticket[0]['cr_number']);
+        $next_number_ticket = $number_ticket[1]+1;
+        $next_ticket = "ACR_".$next_number_ticket."_".date("Ymd");
+
+        // Set Next Id, for Now! it should be doing it automaticlly
+        $next_id = $latest_number_ticket[0]['id']+1;
+
+        $current_user = $req->input('user_name');
+        $vendor_name = $req->input('vendor');
+        $status_ticket = 'Open';
+        $regional = $req->input('regional');
+        $type = $req->input('type_cr');
+        
+        $create_acr = Acrlist::create([
+            'id'                => $next_id,
+            'cr_number'         => $next_ticket,
+            'user_displayname'  => $current_user,
+            'group_name'        => $vendor_name,
+            'status'            => $status_ticket,
+            'regional'          => $regional,
+            'type'              => $type
+        ]);
+
+        $return_acr = $create_acr->toArray();
+
+        if(empty($return_acr)) return response(['status' => false, 'message' => 'Failed to create new CR', 'data' => []], 200);
+
+        return response(['status' => true, 'message' => 'Successfully create new CR', 'data' => $return_acr], 200);
 
     }
 }
