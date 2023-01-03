@@ -70,4 +70,18 @@ class SimpleApi extends Controller
         return response(['status' => true, "data" => ['donut' => $status_total, 'regional' => $total_regional]], 200);
 
     }
+
+    public function getTopWidget()
+    {
+        $get_top_vendor = Crlist::select('group_name as vendor', DB::raw("count(group_name) as total"))->groupBy("vendor")->limit(1)->get();
+        $top_vendor = $get_top_vendor->toArray();
+
+        $get_top_regional = Crlist::select('regional', DB::raw("count(regional) as total"))->groupBy("regional")->limit(1)->get();
+        $top_regional = $get_top_regional->toArray();
+
+        return response(['status' => true, "data" => array(
+            "top_vendor"    => ['vendor' => $top_vendor[0]['vendor'], 'total' => $top_vendor[0]['total']], 
+            "top_regional"  => ['regional' => $top_regional[0]['regional'], 'total' => $top_regional[0]['total']])], 200);
+
+    }
 }

@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/total_cr_type', [SimpleApi::class, 'getTotalCrType']);
 Route::get('/total_cr_chart', [SimpleApi::class, 'getTotalCrChart']);
+Route::get('/total_cr_top', [SimpleApi::class, 'getTopWidget']);
