@@ -86,6 +86,18 @@ class SimpleApi extends Controller
 
     }
 
+    public function getAcrList(Request $req)
+    {
+        $total_page = $req->has("limit") ? $req->input('limit') : 5;
+        $current_page = $req->has("page") ? $req->input('page') : 1;
+
+        $acr_list = Acrlist::orderBy('id', 'DESC')->paginate($total_page, ['*'], $current_page);
+        
+        return response($acr_list, 200);
+
+    }
+
+
     public function postCreateAcr(Request $req)
     {
         // Get Latest Number then add 1
